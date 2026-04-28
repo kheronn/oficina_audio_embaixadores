@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Custom Player - Wenceslau Edition</title>
+    <title>Wenceslau MP3 Player</title>
     <style>
-        /* Reset e Fundo */
+        /* Reset e Estilo de Fundo */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
         }
 
         body {
-            /* SUBSTITUA O LINK ABAIXO PELA SUA IMAGEM DE FUNDO */
+            /* SUBSTITUA PELO LINK DA SUA IMAGEM DO WENCESLAU TOMBADO */
             background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
                         url('https://github.com/kheronn/oficina_audio_embaixadores/blob/main/tombamento.png');
             background-size: cover;
@@ -22,221 +22,193 @@
             background-attachment: fixed;
             height: 100vh;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             color: white;
         }
 
-        .container {
+        .player-card {
             width: 90%;
-            max-width: 800px;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        h2 {
+            max-width: 450px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.2);
             text-align: center;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
         }
 
-        /* Espaço do Vídeo */
-        .video-wrapper {
-            position: relative;
-            width: 100%;
-            padding-top: 56.25%; /* 16:9 Aspect Ratio */
-            background: #000;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        #player {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        /* Controles Customizados */
-        .controls {
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .timeline-container {
+        .album-art {
+            width: 150px;
+            height: 150px;
+            background: #222;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            border: 5px solid #ff0000;
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
+            font-size: 50px;
+            animation: spin 10s linear infinite;
+            animation-play-state: paused;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        h2 { margin-bottom: 5px; letter-spacing: 1px; }
+        p { color: #ccc; margin-bottom: 25px; font-size: 0.9em; }
+
+        /* Controles */
+        .progress-area {
+            width: 100%;
+            margin-bottom: 20px;
         }
 
         input[type="range"] {
-            flex-grow: 1;
+            width: 100%;
             cursor: pointer;
             accent-color: #ff0000;
+        }
+
+        .time-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            margin-top: 5px;
+            color: #ddd;
         }
 
         .buttons {
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 15px;
+            margin-bottom: 25px;
         }
 
         button {
-            background: #ff0000;
+            padding: 12px 25px;
             border: none;
-            color: white;
-            padding: 10px 25px;
-            border-radius: 5px;
+            border-radius: 50px;
             font-weight: bold;
             cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
+            transition: 0.3s;
+            text-transform: uppercase;
         }
 
-        button:hover {
-            background: #cc0000;
-            transform: scale(1.05);
-        }
+        .btn-play { background: #ff0000; color: white; }
+        .btn-pause { background: white; color: black; }
+        
+        button:hover { opacity: 0.8; transform: translateY(-2px); }
 
-        button:active {
-            transform: scale(0.95);
-        }
-
-        /* Input para trocar o vídeo */
-        .url-input {
-            margin-top: 20px;
+        /* Input de URL */
+        .url-box {
             display: flex;
-            gap: 10px;
-            width: 100%;
+            gap: 5px;
         }
 
-        .url-input input {
-            flex-grow: 1;
-            padding: 8px;
-            border-radius: 4px;
+        .url-box input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 5px;
             border: none;
-            background: rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.3);
             color: white;
-            outline: none;
+            font-size: 12px;
         }
+
+        .btn-load { background: #28a745; color: white; padding: 10px; border-radius: 5px; font-size: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2>Custom Music Player</h2>
+    <audio id="main-audio" src=""></audio>
 
-        <div class="video-wrapper">
-            <div id="player"></div>
-        </div>
+    <div class="player-card">
+        <div class="album-art" id="disc">🎵</div>
+        <h2>Wenceslau Braz Hit</h2>
+        <p>Capital do Tombamento</p>
 
-        <div class="controls">
-            <div class="timeline-container">
-                <span id="current-time">0:00</span>
-                <input type="range" id="progress-bar" value="0" max="100">
-                <span id="duration">0:00</span>
-            </div>
-
-            <div class="buttons">
-                <button onclick="playVideo()">PLAY</button>
-                <button onclick="pauseVideo()" style="background: #555;">PAUSE</button>
+        <div class="progress-area">
+            <input type="range" id="seek-bar" value="0" max="100">
+            <div class="time-labels">
+                <span id="current">0:00</span>
+                <span id="total">0:00</span>
             </div>
         </div>
 
-        <div class="url-input">
-            <input type="text" id="video-id" placeholder="Cole o ID do vídeo (Ex: dQw4w9WgXcQ)">
-            <button onclick="loadNewVideo()" style="background: #28a745;">CARREGAR</button>
+        <div class="buttons">
+            <button class="btn-play" onclick="playAudio()">Play</button>
+            <button class="btn-pause" onclick="pauseAudio()">Pause</button>
+        </div>
+
+        <div class="url-box">
+            <input type="text" id="audio-url" placeholder="Cole a URL do MP3 aqui...">
+            <button class="btn-load" onclick="loadAudio()">CARREGAR</button>
         </div>
     </div>
 
     <script>
-        var player;
-        var progressBar = document.getElementById('progress-bar');
-        var currentTimeEl = document.getElementById('current-time');
-        var durationEl = document.getElementById('duration');
+        const audio = document.getElementById('main-audio');
+        const seekBar = document.getElementById('seek-bar');
+        const currentTimeEl = document.getElementById('current');
+        const durationEl = document.getElementById('total');
+        const disc = document.getElementById('disc');
 
-        // 1. Carrega a API do YouTube
-        var tag = document.createElement('script');
-        tag.src = "https://www.youtube.com/iframe_api";
-        var firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-        // 2. Cria o player após a API carregar
-        function onYouTubeIframeAPIReady() {
-            player = new YT.Player('player', {
-                height: '100%',
-                width: '100%',
-                videoId: 'dQw4w9WgXcQ', // Vídeo inicial padrão
-                playerVars: {
-                    'controls': 0, // Esconde os controles originais do YT
-                    'disablekb': 1,
-                    'rel': 0
-                },
-                events: {
-                    'onReady': onPlayerReady
-                }
-            });
-        }
-
-        function onPlayerReady(event) {
-            // Atualiza a linha do tempo a cada 1 segundo
-            setInterval(updateTimeline, 1000);
-        }
-
-        function playVideo() {
-            player.playVideo();
-        }
-
-        function pauseVideo() {
-            player.pauseVideo();
-        }
-
-        function loadNewVideo() {
-            var videoId = document.getElementById('video-id').value;
-            if (videoId) {
-                player.loadVideoById(videoId);
+        function loadAudio() {
+            const url = document.getElementById('audio-url').value;
+            if(url) {
+                audio.src = url;
+                audio.load();
+                alert("Áudio carregado! Clique em Play.");
             }
         }
 
-        // Atualiza a barra de progresso e os números
-        function updateTimeline() {
-            if (player && player.getCurrentTime) {
-                var current = player.getCurrentTime();
-                var total = player.getDuration();
+        function playAudio() {
+            if(audio.src) {
+                audio.play();
+                disc.style.animationPlayState = 'running';
+            } else {
+                alert("Por favor, carregue uma URL de MP3 primeiro.");
+            }
+        }
+
+        function pauseAudio() {
+            audio.pause();
+            disc.style.animationPlayState = 'paused';
+        }
+
+        // Atualiza a barra de progresso conforme a música toca
+        audio.ontimeupdate = function() {
+            if (audio.duration) {
+                const percentage = (audio.currentTime / audio.duration) * 100;
+                seekBar.value = percentage;
                 
-                if (total > 0) {
-                    var pct = (current / total) * 100;
-                    progressBar.value = pct;
-                    
-                    currentTimeEl.innerText = formatTime(current);
-                    durationEl.innerText = formatTime(total);
-                }
+                currentTimeEl.innerText = formatTime(audio.currentTime);
+                durationEl.innerText = formatTime(audio.duration);
             }
+        };
+
+        // Permite arrastar a barra para mudar o tempo da música
+        seekBar.oninput = function() {
+            const seekTo = (seekBar.value / 100) * audio.duration;
+            audio.currentTime = seekTo;
+        };
+
+        function formatTime(seconds) {
+            let min = Math.floor(seconds / 60);
+            let sec = Math.floor(seconds % 60);
+            if (sec < 10) sec = `0${sec}`;
+            return `${min}:${sec}`;
         }
 
-        // Permite clicar na barra para buscar (seek)
-        progressBar.addEventListener('input', function() {
-            var total = player.getDuration();
-            var time = (progressBar.value / 100) * total;
-            player.seekTo(time, true);
-        });
-
-        // Formata segundos em MM:SS
-        function formatTime(time) {
-            time = Math.round(time);
-            var minutes = Math.floor(time / 60);
-            var seconds = time % 60;
-            seconds = seconds < 10 ? '0' + seconds : seconds;
-            return minutes + ":" + seconds;
-        }
+        // Resetar o disco quando a música acabar
+        audio.onended = function() {
+            disc.style.animationPlayState = 'paused';
+        };
     </script>
 </body>
 </html>

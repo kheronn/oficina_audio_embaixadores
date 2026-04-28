@@ -176,60 +176,68 @@
             </button>
         </div>
     </div>
+<script>
+    const audio = document.getElementById('audio-player');
+    const playBtn = document.getElementById('play-node');
+    const pauseBtn = document.getElementById('pause-node');
+    const seekBar = document.getElementById('seek-bar');
+    const currentTimeText = document.getElementById('current-time');
+    const durationText = document.getElementById('total-duration');
+    const albumSpin = document.getElementById('album-spin');
 
-    <script>
-        const audio = document.getElementById('audio-player');
-        const playBtn = document.getElementById('play-node');
-        const pauseBtn = document.getElementById('pause-node');
-        const seekBar = document.getElementById('seek-bar');
-        const currentTimeText = document.getElementById('current-time');
-        const durationText = document.getElementById('total-duration');
-        const albumSpin = document.getElementById('album-spin');
+    // VERIFICADOR DE ERROS
+    audio.onerror = function() {
+        console.error("Erro ao carregar áudio:", audio.error);
+        alert("Erro: O link do áudio é inválido ou não é um link direto de MP3.");
+    };
 
-        function togglePlay(isPlay) {
-            if (isPlay) {
-                audio.play();
-                playBtn.style.display = 'none';
-                pauseBtn.style.display = 'flex';
-                albumSpin.style.animationPlayState = 'running';
-            } else {
-                audio.pause();
-                playBtn.style.display = 'flex';
-                pauseBtn.style.display = 'none';
-                albumSpin.style.animationPlayState = 'paused';
-            }
+    function togglePlay(isPlay) {
+        if (!audio.src || audio.src.includes("COLE_AQUI")) {
+            alert("Você esqueceu de colocar a URL do MP3 no código!");
+            return;
         }
 
-        // Atualiza a barra de progresso
-        audio.ontimeupdate = () => {
-            const pct = (audio.currentTime / audio.duration) * 100;
-            seekBar.value = pct || 0;
-            currentTimeText.innerText = formatTime(audio.currentTime);
-        };
-
-        // Carrega a duração total quando o áudio estiver pronto
-        audio.onloadedmetadata = () => {
-            durationText.innerText = formatTime(audio.duration);
-        };
-
-        // Busca (Seek) na música
-        seekBar.oninput = () => {
-            const time = (seekBar.value / 100) * audio.duration;
-            audio.currentTime = time;
-        };
-
-        // Formatação de tempo (00:00)
-        function formatTime(seconds) {
-            let min = Math.floor(seconds / 60);
-            let sec = Math.floor(seconds % 60);
-            return `${min < 10 ? '0' + min : min}:${sec < 10 ? '0' + sec : sec}`;
+        if (isPlay) {
+            audio.play().catch(e => {
+                alert("O navegador bloqueou ou não encontrou o arquivo. Verifique o link.");
+            });
+            playBtn.style.display = 'none';
+            pauseBtn.style.display = 'flex';
+            albumSpin.style.animationPlayState = 'running';
+        } else {
+            audio.pause();
+            playBtn.style.display = 'flex';
+            pauseBtn.style.display = 'none';
+            albumSpin.style.animationPlayState = 'paused';
         }
+    }
 
-        // Se a música acabar, reseta o botão
-        audio.onended = () => {
-            togglePlay(false);
-            seekBar.value = 0;
-        };
-    </script>
-</body>
+    audio.ontimeupdate = () => {
+        const pct = (audio.currentTime / audio.duration) * 100;
+        seekBar.value = pct || 0;
+        currentTimeText.innerText = formatTime(audio.currentTime);
+    };
+
+    audio.onloadedmetadata = () => {
+        durationText.innerText = formatTime(audio.duration);
+    };
+
+    seekBar.oninput = () => {
+        const time = (seekBar.value / 100) * audio.duration;
+        audio.currentTime = time;
+    };
+
+    function formatTime(seconds) {
+        if (isNaN(seconds)) return "00:00";
+        let min = Math.floor(seconds / 60);
+        let sec = Math.floor(seconds % 60);
+        return `${min < 10 ? '0' + min : min}:${sec < 10 ? '0' + sec : sec}`;
+    }
+
+    audio.onended = () => {
+        togglePlay(false);
+        seekBar.value = 0;
+    };
+</script>
+ </body>
 </html>

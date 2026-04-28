@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Custom Player - Wenceslau Edition</title>
+    <style>
+        /* Reset e Fundo */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            /* SUBSTITUA O LINK ABAIXO PELA SUA IMAGEM DE FUNDO */
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
+                        url('https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Espaço do Vídeo */
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        #player {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Controles Customizados */
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .timeline-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="range"] {
+            flex-grow: 1;
+            cursor: pointer;
+            accent-color: #ff0000;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        button {
+            background: #ff0000;
+            border: none;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        button:hover {
+            background: #cc0000;
+            transform: scale(1.05);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        /* Input para trocar o vídeo */
+        .url-input {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .url-input input {
+            flex-grow: 1;
+            padding: 8px;
+            border-radius: 4px;
+            border: none;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Custom Music Player</h2>
+
+        <div class="video-wrapper">
+            <div id="player"></div>
+        </div>
+
+        <div class="controls">
+            <div class="timeline-container">
+                <span id="current-time">0:00</span>
+                <input type="range" id="progress-bar" value="0" max="100">
+                <span id="duration">0:00</span>
+            </div>
+
+            <div class="buttons">
+                <button onclick="playVideo()">PLAY</button>
+                <button onclick="pauseVideo()" style="background: #555;">PAUSE</button>
+            </div>
+        </div>
+
+        <div class="url-input">
+            <input type="text" id="video-id" placeholder="Cole o ID do vídeo (Ex: dQw4w9WgXcQ)">
+            <button onclick="loadNewVideo()" style="background: #28a745;">CARREGAR</button>
+        </div>
+    </div>
+
+    <script>
+        var player;
+        var progressBar = document.getElementById('progress-bar');
+        var currentTimeEl = document.getElementById('current-time');
+        var durationEl = document.getElementById('duration');
+
+        // 1. Carrega a API do YouTube
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        // 2. Cria o player após a API carregar
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                height: '100%',
+                width: '100%',
+                videoId: 'dQw4w9WgXcQ', // Vídeo inicial padrão
+                playerVars: {
+                    'controls': 0, // Esconde os controles originais do YT
+                    'disablekb': 1,
+                    'rel': 0
+                },
+                events: {
+                    'onReady': onPlayerReady
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            // Atualiza a linha do tempo a cada 1 segundo
+            setInterval(updateTimeline, 1000);
+        }
+
+        function playVideo() {
+            player.playVideo();
+        }
+
+        function pauseVideo() {
+            player.pauseVideo();
+        }
+
+        function loadNewVideo() {
+            var videoId = document.getElementById('video-id').value;
+            if (videoId) {
+                player.loadVideoById(videoId);
+            }
+        }
+
+        // Atualiza a barra de progresso e os números
+        function updateTimeline() {
+            if (player && player.getCurrentTime) {
+                var current = player.getCurrentTime();
+                var total = player.getDuration();
+                
+                if (total > 0) {
+                    var pct = (current / total) * 100;
+                    progressBar.value = pct;
+                    
+                    currentTimeEl.innerText = formatTime(current);
+                    durationEl.innerText = formatTime(total);
+                }
+            }
+        }
+
+        // Permite clicar na barra para buscar (seek)
+        progressBar.addEventListener('input', function() {
+            var total = player.getDuration();
+            var time = (progressBar.value / 100) * total;
+            player.seekTo(time, true);
+        });
+
+        // Formata segundos em MM:SS
+        function formatTime(time) {
+            time = Math.round(time);
+            var minutes = Math.floor(time / 60);
+            var seconds = time % 60;
+            seconds = seconds < 10 ? '0' + seconds : seconds;
+            return minutes + ":" + seconds;
+        }
+    </script>
+</body>
+</html>

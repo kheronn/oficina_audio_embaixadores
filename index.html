@@ -3,20 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wenceslau MP3 Player</title>
+    <title>Wenceslau Dead - Official Player</title>
     <style>
-        /* Reset e Estilo de Fundo */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', Roboto, sans-serif;
         }
 
         body {
-            /* SUBSTITUA PELO LINK DA SUA IMAGEM DO WENCESLAU TOMBADO */
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
-                        url('https://github.com/kheronn/oficina_audio_embaixadores/blob/main/tombamento.png');
+            /* IMAGEM DE FUNDO: Substitua o link abaixo pela imagem que desejar */
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
+                        url('https://images.unsplash.com/photo-1519074069444-1ba4fff66d16?auto=format&fit=crop&w=1920&q=80');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -25,33 +24,45 @@
             align-items: center;
             justify-content: center;
             color: white;
+            overflow: hidden;
         }
 
-        .player-card {
+        .player-container {
             width: 90%;
-            max-width: 450px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255,255,255,0.2);
+            max-width: 400px;
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(20px);
+            padding: 40px 30px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             text-align: center;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
         }
 
-        .album-art {
-            width: 150px;
-            height: 150px;
-            background: #222;
-            margin: 0 auto 20px;
+        /* Capa do Álbum (Estilo Vinil) */
+        .album-cover {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 30px;
+            background: #111;
             border-radius: 50%;
-            border: 5px solid #ff0000;
+            border: 8px solid rgba(255, 0, 0, 0.8);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 50px;
-            animation: spin 10s linear infinite;
+            position: relative;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+            animation: spin 12s linear infinite;
             animation-play-state: paused;
+        }
+
+        .album-cover::after {
+            content: '';
+            width: 40px;
+            height: 40px;
+            background: #141414;
+            border-radius: 50%;
+            border: 4px solid #333;
         }
 
         @keyframes spin {
@@ -59,155 +70,165 @@
             to { transform: rotate(360deg); }
         }
 
-        h2 { margin-bottom: 5px; letter-spacing: 1px; }
-        p { color: #ccc; margin-bottom: 25px; font-size: 0.9em; }
+        h1 { font-size: 1.5rem; margin-bottom: 5px; color: #fff; }
+        p { font-size: 0.9rem; color: #aaa; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 2px; }
 
-        /* Controles */
-        .progress-area {
+        /* Timeline / Barra de Progresso */
+        .timeline-box {
             width: 100%;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
 
         input[type="range"] {
             width: 100%;
+            height: 6px;
+            background: #333;
+            border-radius: 5px;
+            outline: none;
             cursor: pointer;
-            accent-color: #ff0000;
+            accent-color: #ff0000; /* Cor da bolinha e trilha */
         }
 
-        .time-labels {
+        .time-info {
             display: flex;
             justify-content: space-between;
             font-size: 12px;
-            margin-top: 5px;
-            color: #ddd;
+            color: #777;
+            margin-top: 8px;
+            font-family: monospace;
         }
 
-        .buttons {
+        /* Botões de Controle */
+        .controls {
             display: flex;
+            align-items: center;
             justify-content: center;
-            gap: 15px;
-            margin-bottom: 25px;
+            gap: 25px;
         }
 
-        button {
-            padding: 12px 25px;
+        .control-btn {
+            background: none;
             border: none;
-            border-radius: 50px;
-            font-weight: bold;
             cursor: pointer;
-            transition: 0.3s;
-            text-transform: uppercase;
-        }
-
-        .btn-play { background: #ff0000; color: white; }
-        .btn-pause { background: white; color: black; }
-        
-        button:hover { opacity: 0.8; transform: translateY(-2px); }
-
-        /* Input de URL */
-        .url-box {
+            transition: all 0.3s ease;
             display: flex;
-            gap: 5px;
+            align-items: center;
+            justify-content: center;
         }
 
-        .url-box input {
-            flex: 1;
-            padding: 10px;
-            border-radius: 5px;
-            border: none;
-            background: rgba(0,0,0,0.3);
+        .play-btn {
+            width: 70px;
+            height: 70px;
+            background: #ff0000;
+            border-radius: 50%;
             color: white;
-            font-size: 12px;
+            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.4);
         }
 
-        .btn-load { background: #28a745; color: white; padding: 10px; border-radius: 5px; font-size: 10px; }
+        .play-btn:hover {
+            transform: scale(1.1);
+            background: #cc0000;
+        }
+
+        .pause-btn {
+            width: 70px;
+            height: 70px;
+            background: white;
+            border-radius: 50%;
+            color: black;
+            display: none; /* Começa escondido */
+        }
+
+        .pause-btn:hover {
+            transform: scale(1.1);
+            background: #ddd;
+        }
+
+        svg { fill: currentColor; width: 24px; height: 24px; }
+
     </style>
 </head>
 <body>
 
-    <audio id="main-audio" src=""></audio>
+    <audio id="audio-player" src="https://github.com/kheronn/oficina_audio_embaixadores/blob/main/capital_tombamento.mp3"></audio>
 
-    <div class="player-card">
-        <div class="album-art" id="disc">🎵</div>
-        <h2>Wenceslau Braz Hit</h2>
+    <div class="player-container">
+        <div class="album-cover" id="album-spin"></div>
+        
+        <h1>Wenceslau Dead</h1>
         <p>Capital do Tombamento</p>
 
-        <div class="progress-area">
+        <div class="timeline-box">
             <input type="range" id="seek-bar" value="0" max="100">
-            <div class="time-labels">
-                <span id="current">0:00</span>
-                <span id="total">0:00</span>
+            <div class="time-info">
+                <span id="current-time">00:00</span>
+                <span id="total-duration">00:00</span>
             </div>
         </div>
 
-        <div class="buttons">
-            <button class="btn-play" onclick="playAudio()">Play</button>
-            <button class="btn-pause" onclick="pauseAudio()">Pause</button>
-        </div>
-
-        <div class="url-box">
-            <input type="text" id="audio-url" placeholder="Cole a URL do MP3 aqui...">
-            <button class="btn-load" onclick="loadAudio()">CARREGAR</button>
+        <div class="controls">
+            <button class="control-btn play-btn" id="play-node" onclick="togglePlay(true)">
+                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+            
+            <button class="control-btn pause-btn" id="pause-node" onclick="togglePlay(false)">
+                <svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            </button>
         </div>
     </div>
 
     <script>
-        const audio = document.getElementById('main-audio');
+        const audio = document.getElementById('audio-player');
+        const playBtn = document.getElementById('play-node');
+        const pauseBtn = document.getElementById('pause-node');
         const seekBar = document.getElementById('seek-bar');
-        const currentTimeEl = document.getElementById('current');
-        const durationEl = document.getElementById('total');
-        const disc = document.getElementById('disc');
+        const currentTimeText = document.getElementById('current-time');
+        const durationText = document.getElementById('total-duration');
+        const albumSpin = document.getElementById('album-spin');
 
-        function loadAudio() {
-            const url = document.getElementById('audio-url').value;
-            if(url) {
-                audio.src = url;
-                audio.load();
-                alert("Áudio carregado! Clique em Play.");
-            }
-        }
-
-        function playAudio() {
-            if(audio.src) {
+        function togglePlay(isPlay) {
+            if (isPlay) {
                 audio.play();
-                disc.style.animationPlayState = 'running';
+                playBtn.style.display = 'none';
+                pauseBtn.style.display = 'flex';
+                albumSpin.style.animationPlayState = 'running';
             } else {
-                alert("Por favor, carregue uma URL de MP3 primeiro.");
+                audio.pause();
+                playBtn.style.display = 'flex';
+                pauseBtn.style.display = 'none';
+                albumSpin.style.animationPlayState = 'paused';
             }
         }
 
-        function pauseAudio() {
-            audio.pause();
-            disc.style.animationPlayState = 'paused';
-        }
-
-        // Atualiza a barra de progresso conforme a música toca
-        audio.ontimeupdate = function() {
-            if (audio.duration) {
-                const percentage = (audio.currentTime / audio.duration) * 100;
-                seekBar.value = percentage;
-                
-                currentTimeEl.innerText = formatTime(audio.currentTime);
-                durationEl.innerText = formatTime(audio.duration);
-            }
+        // Atualiza a barra de progresso
+        audio.ontimeupdate = () => {
+            const pct = (audio.currentTime / audio.duration) * 100;
+            seekBar.value = pct || 0;
+            currentTimeText.innerText = formatTime(audio.currentTime);
         };
 
-        // Permite arrastar a barra para mudar o tempo da música
-        seekBar.oninput = function() {
-            const seekTo = (seekBar.value / 100) * audio.duration;
-            audio.currentTime = seekTo;
+        // Carrega a duração total quando o áudio estiver pronto
+        audio.onloadedmetadata = () => {
+            durationText.innerText = formatTime(audio.duration);
         };
 
+        // Busca (Seek) na música
+        seekBar.oninput = () => {
+            const time = (seekBar.value / 100) * audio.duration;
+            audio.currentTime = time;
+        };
+
+        // Formatação de tempo (00:00)
         function formatTime(seconds) {
             let min = Math.floor(seconds / 60);
             let sec = Math.floor(seconds % 60);
-            if (sec < 10) sec = `0${sec}`;
-            return `${min}:${sec}`;
+            return `${min < 10 ? '0' + min : min}:${sec < 10 ? '0' + sec : sec}`;
         }
 
-        // Resetar o disco quando a música acabar
-        audio.onended = function() {
-            disc.style.animationPlayState = 'paused';
+        // Se a música acabar, reseta o botão
+        audio.onended = () => {
+            togglePlay(false);
+            seekBar.value = 0;
         };
     </script>
 </body>
